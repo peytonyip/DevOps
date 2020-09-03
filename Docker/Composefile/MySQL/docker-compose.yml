@@ -1,0 +1,96 @@
+version: "3.8"
+services:
+  mysql-server:
+    image: mysql:5.7
+    container_name: mysql-server
+    hostname: mysql-server
+    ports:
+      - "3306:3306"
+    volumes:
+      - /home/data/mysql_data:/var/lib/mysql:rw
+      - /home/conf/mysql:/etc/mysql/conf.d:rw
+      - /var/log/mysql:/var/log/mysql:rw
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    env_file:
+      - .env_db_mysql
+    secrets:
+      - MYSQL_USER
+      - MYSQL_PASSWORD
+      - MYSQL_ROOT_PASSWORD
+    command:
+      - mysqld
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_bin
+    stop_grace_period: 1m
+    restart: always
+    networks:
+      docker_dev:
+        ipv4_address: 172.20.0.2
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.8.9
+    container_name: elasticsearch
+    hostname: elasticsearch
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    #user: "1001"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      #nofile:
+      #  soft: 65535
+      #  hard: 65535
+      #nproc: 65535
+    volumes:
+      - /home/data/elasticsearch_data:/usr/share/elasticsearch/data:rw
+      - /home/data/elasticsearch_data/plugins:/usr/share/elasticsearch/plugins:rw
+      - /home/conf/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:rw
+      - /var/log/elasticserch:/usr/share/elasticsearch/logs:rw
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    restart: always
+    networks:
+      docker_dev:
+        ipv4_address: 172.20.0.3
+
+  redis-server:
+    image: redis:6.0.6
+    container_name: redis-server
+    hostname: redis-server
+    ports:
+      - "6379:6379"
+    volumes:
+      - /home/conf/redis/redis.conf:/etc/redis/redis.conf:rw
+      - /home/data/redis_data:/data:rw
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    command:
+      - redis-server /etc/redis/redis.conf --appendonly yes
+    restart: always
+    networks:
+      docker_dev:
+        ipv4_address: 172.20.0.5
+
+
+networks:
+  docker_dev:
+    driver: bridge
+    driver_opts:
+      com.docker.network.enable_ipv6: "false"
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.0.0/16
+
+secrets:
+  MYSQL_USER:
+    file: ./.MYSQL_USER
+  MYSQL_PASSWORD:
+    file: ./.MYSQL_PASSWORD
+  MYSQL_ROOT_PASSWORD:
+    file: ./.MYSQL_ROOT_PASSWORD
