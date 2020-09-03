@@ -7,9 +7,9 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - /home/data/mysql_data:/var/lib/mysql:rw
-      - /home/conf/mysql:/etc/mysql/conf.d:rw
-      - /var/log/mysql:/var/log/mysql:rw
+      - /home/peyton/data/data/mysql_data:/var/lib/mysql:rw
+      - /home/peyton/data/conf/mysql:/etc/mysql/conf.d:rw
+      - /home/peyton/data/logs/mysql:/var/log/mysql:rw
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
     env_file:
@@ -23,13 +23,13 @@ services:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_bin
     stop_grace_period: 1m
-    restart: always
+    #restart: always
     networks:
       docker_dev:
         ipv4_address: 172.20.0.2
 
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:6.8.9
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.9.0-amd64
     container_name: elasticsearch
     hostname: elasticsearch
     ports:
@@ -47,31 +47,32 @@ services:
       #  hard: 65535
       #nproc: 65535
     volumes:
-      - /home/data/elasticsearch_data:/usr/share/elasticsearch/data:rw
-      - /home/data/elasticsearch_data/plugins:/usr/share/elasticsearch/plugins:rw
-      - /home/conf/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:rw
-      - /var/log/elasticserch:/usr/share/elasticsearch/logs:rw
+      - /home/peyton/data/data/elasticsearch_data:/usr/share/elasticsearch/data:rw
+      - /home/peyton/data/data/elasticsearch_data/plugins:/usr/share/elasticsearch/plugins:rw
+      - /home/peyton/data/conf/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:rw
+      - /home/peyton/data/logs/elasticserch:/usr/share/elasticsearch/logs:rw
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
-    restart: always
+    #restart: always
     networks:
       docker_dev:
         ipv4_address: 172.20.0.3
 
   redis-server:
-    image: redis:6.0.6
+    image: redis:6.0
     container_name: redis-server
     hostname: redis-server
     ports:
       - "6379:6379"
     volumes:
-      - /home/conf/redis/redis.conf:/etc/redis/redis.conf:rw
-      - /home/data/redis_data:/data:rw
+      #- /home/peyton/data/conf/redis/redis.conf:/etc/redis/redis.conf:rw
+      - /home/peyton/data/data/redis_data:/data:rw
+      - /home/peyton/data/logs/redis:/var/log/redis:rw
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
     command:
       - redis-server /etc/redis/redis.conf --appendonly yes
-    restart: always
+    #restart: always
     networks:
       docker_dev:
         ipv4_address: 172.20.0.5
