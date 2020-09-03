@@ -1,0 +1,4 @@
+node.name: es_dev
+cluster.name: es_docker_cluster
+discovery.type: single-node
+bootstrap.memory_lock: true
